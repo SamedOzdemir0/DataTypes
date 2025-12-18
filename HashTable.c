@@ -19,7 +19,7 @@ struct HashTable
 };
 unsigned hash(char *key, int multiplier, int table_size) // Hash key creating;
 {
-    unsigned int value;
+    unsigned int value = 0;
     int i = 0;
     while (key[i] != '\0')
     {
@@ -33,6 +33,8 @@ void initialize_hash_table(struct HashTable **hash_table, int table_size, int mu
 {
     *hash_table = (struct HashTable *)malloc(sizeof(struct HashTable));
     int i;
+    (*hash_table)->table_size = table_size;
+    (*hash_table)->multiplier = multiplier;
     (*hash_table)->table_root = (struct Node *)malloc(sizeof(struct Node) * table_size); // Hash table array created!
     for (i = 0; i < table_size; i++)
     {
@@ -50,7 +52,7 @@ int insert(char *key, struct CELL **l)
         (*l)->next = NULL;
         return 1;
     }
-    else if (strcmp(key, (*l)->key))
+    else if (strcmp(key, (*l)->key) != 0)
         return insert(key, &((*l)->next));
     else
         return 0;
@@ -58,9 +60,44 @@ int insert(char *key, struct CELL **l)
 void insert_hash_table(struct HashTable *HashTable, char *key)
 {
     unsigned int hash_index = hash(key, HashTable->multiplier, HashTable->table_size);
-    insert(key, &(((HashTable->table_root) + hash_index)->header));
+    if (insert(key, &(((HashTable->table_root) + hash_index)->header)))
+        ((HashTable->table_root) + hash_index)->counter++;
 }
+void print_hash_table(struct HashTable *HashTable)
+{
+    if (HashTable != NULL)
+    {
+        int i;
+        int table_size = HashTable->table_size;
+        printf("\n----------------Hash Table--------------------");
+        for (i = 0; i < table_size; i++)
+        {
+            printf("\nCount;%d  ", (HashTable->table_root + i)->counter);
+            print_hash_chain((HashTable->table_root + i)->header);
+            printf("\n");
+        }
+        printf("\n");
+        return;
+    }
+    printf("Hash Table is empty");
+    return;
+}
+void print_hash_chain(struct CELL *l)
+{
+    while (l != NULL)
+    {
+        printf("{%s}  ", l->key);
+        l = l->next;
+    }
+    return;
+}
+
 int main()
 {
+    struct HashTable *HashTab = NULL;
+    initialize_hash_table(&HashTab, 5, 3);
+    insert_hash_table(HashTab, "Samed");
+    print_hash_table(HashTab);
+
     return 0;
 }
