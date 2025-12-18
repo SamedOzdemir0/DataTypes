@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 struct CELL
 {
     char *key;
@@ -37,8 +38,27 @@ void initialize_hash_table(struct HashTable **hash_table, int table_size, int mu
     {
         ((((*hash_table)->table_root) + i)->counter) = 0;
         ((((*hash_table)->table_root) + i)->header) = NULL;
-
     }
+}
+int insert(char *key, struct CELL **l)
+{
+    if (*l == NULL)
+    {
+        *l = (struct CELL *)malloc(sizeof(struct CELL));
+        (*l)->key = (char *)malloc(sizeof(char) * (strlen(key) + 1));
+        strcpy((*l)->key, key);
+        (*l)->next = NULL;
+        return 1;
+    }
+    else if (strcmp(key, (*l)->key))
+        return insert(key, &((*l)->next));
+    else
+        return 0;
+}
+void insert_hash_table(struct HashTable *HashTable, char *key)
+{
+    unsigned int hash_index = hash(key, HashTable->multiplier, HashTable->table_size);
+    insert(key, &(((HashTable->table_root) + hash_index)->header));
 }
 int main()
 {
