@@ -72,7 +72,7 @@ void print_hash_table(struct HashTable *HashTable)
         printf("\n----------------Hash Table--------------------");
         for (i = 0; i < table_size; i++)
         {
-            printf("\nCount;%d  ", (HashTable->table_root + i)->counter);
+            printf("\n(%d)  ", (HashTable->table_root + i)->counter);
             print_hash_chain((HashTable->table_root + i)->header);
             printf("\n");
         }
@@ -91,12 +91,55 @@ void print_hash_chain(struct CELL *l)
     }
     return;
 }
+void hashtable_enlargement(struct HashTable **HashTab, int new_size, int new_multipler)
+{
+    int index;
+    struct HashTable *newHashTable = NULL;
+    struct CELL *iter;
+    initialize_hash_table(&newHashTable, new_size, new_multipler);
+    for (index = 0; index < (*HashTab)->table_size; index++)
+    {
+        iter = ((*HashTab)->table_root + index)->header;
+        while (iter != NULL)
+        {
+            insert_hash_table(newHashTable, iter->key);
+            iter = iter->next;
+        }
+    }
+}
+void destroy_HashTable(struct HashTable **hashtable)
+{
 
+    int i = 0;
+    for (i; i < (*hashtable)->table_size; i++)
+    {
+        destroy_linked_list(((*hashtable)->table_root + i)->header);
+    }
+    free((*hashtable)->table_root);
+    free(*hashtable);
+    *hashtable = NULL;
+}
+void destroy_linked_list(struct CELL **list)
+{
+    struct CELL *back;
+
+    while (*list != NULL)
+    {
+        back = *list;
+        *list = (*list)->next;
+        free(back->key);
+        free(back);
+    }
+}
 int main()
 {
     struct HashTable *HashTab = NULL;
     initialize_hash_table(&HashTab, 5, 3);
     insert_hash_table(HashTab, "Samed");
+    insert_hash_table(HashTab, "Ozdemir");
+    insert_hash_table(HashTab, "Istanbul");
+    insert_hash_table(HashTab, "Amerika");
+    insert_hash_table(HashTab, "Paris");
     print_hash_table(HashTab);
 
     return 0;
