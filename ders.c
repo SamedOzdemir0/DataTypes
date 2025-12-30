@@ -151,7 +151,7 @@ int tek_cocuklu_dugum_sayisi(struct dugum *kok)
 
     return 0;
 }--------------------------------------------------------------------------------------------------------*/
-
+/*
 struct cell
 {
     char *anahtar;
@@ -185,6 +185,60 @@ unsigned int hash(char *s, int multiplier, int table_size)
 int main()
 {
     return 0;
-
 }
-void listeyi_hash_tablosuna_donusturme(struct hash_tablosu *htable, struct cell **liste_basi){}
+void listeyi_hash_tablosuna_donusturme(struct hash_tablosu *htable, struct cell **liste_basi)
+{
+    if (liste_basi == NULL || (*liste_basi) == NULL)
+        return;
+    struct cell *temp = (*liste_basi)->next;
+    int value = hash((*liste_basi)->anahtar, htable->multiplier, htable->tablo_uzunlugu);
+    struct cell **iter = &((htable->tablo_basi + value)->header);
+    (*liste_basi)->next = *iter;
+    *iter = *liste_basi;
+    (*liste_basi) = temp;
+    (htable->tablo_basi + value)->count--;
+    if (*liste_basi != NULL)
+        listeyi_hash_tablosuna_donusturme(htable, liste_basi);
+}--------------------------------------------------------------------------------------------------------*/
+struct cell
+{
+    char *anahtar;
+    struct cell *next;
+};
+
+struct table_node
+{
+    int count;
+    struct cell *header;
+};
+
+struct hash_tablosu
+{
+    struct table_node *tablo_basi;
+    int tablo_uzunlugu;
+    int multiplier;
+};
+
+unsigned int hash(char *s, int multiplier, int table_size)
+{
+    int i = 0;
+    unsigned int value = 0;
+    while (s[i] != '\0')
+    {
+        value = (s[i] + multiplier * value) % table_size;
+        i++;
+    }
+    return value;
+};
+
+int main()
+{
+}
+int aynimi(struct hash_tablosu *h1, struct hash_tablosu *h2)
+{
+    if (h1 != h2)
+        return 0;
+
+    
+    
+}
